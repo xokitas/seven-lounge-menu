@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>Seven Lounge - Menú Digital</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@300;400;600&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+    body {
+      font-family: 'Inter', system-ui, sans-serif;
+      background: #050505;
+      color: #e8dcc8;
+      overflow-x: hidden;
+    }
+    #app {
+      max-width: 430px;
+      margin: 0 auto;
+      min-height: 100vh;
+      position: relative;
+      background: #0a0a0a;
+      box-shadow: 0 0 60px rgba(0,0,0,0.8);
+    }
+    .screen { display: none; animation: fadeIn 0.4s ease; }
+    .screen.active { display: block; }
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(12px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes slideUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+    @keyframes bounce {
+      0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+      40% { transform: translateY(-10px); }
+      60% { transform: translateY(-5px); }
+    }
+    .product-card { animation: slideUp 0.35s ease both; }
+    .font-display { font-family: 'Playfair Display', Georgia, serif; }
+    .gold { color: #d4af37; }
+    .gold-bg { background: #d4af37; }
+    .gold-border { border-color: rgba(212,175,55,0.25); }
+    .text-cream { color: #f5f0e6; }
+    .text-cream-dim { color: rgba(245,240,230,0.55); }
+    .text-cream-faint { color: rgba(245,240,230,0.35); }
+    .bg-dark { background: #0a0a0a; }
+    .bg-dark-elevated { background: rgba(255,255,255,0.025); }
+    .bg-gold-subtle { background: rgba(212,175,55,0.06); }
+    .bg-gold-hover { background: rgba(212,175,55,0.1); }
+    .available { background: rgba(74,222,128,0.12); color: #4ade80; }
+    .unavailable { background: rgba(248,113,113,0.12); color: #f87171; }
+    .btn-gold {
+      background: transparent;
+      border: 1px solid #d4af37;
+      color: #d4af37;
+      padding: 14px 48px;
+      font-size: 12px;
+      letter-spacing: 3px;
+      text-transform: uppercase;
+      cursor: pointer;
+      border-radius: 2px;
+      font-family: 'Inter', sans-serif;
+      font-weight: 500;
+      transition: all 0.3s ease;
+    }
+    .btn-gold:hover { background: rgba(212,175,55,0.12); }
+    .category-card {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 16px 20px;
+      border: 1px solid rgba(212,175,55,0.18);
+      border-radius: 12px;
+      cursor: pointer;
+      background: rgba(212,175,55,0.03);
+      transition: all 0.25s ease;
+    }
+    .category-card:hover { background: rgba(212,175,55,0.08); border-color: rgba(212,175,55,0.35); transform: translateY(-1px); }
+    .product-img {
+      width: 76px;
+      height: 76px;
+      border-radius: 10px;
+      background: rgba(212,175,55,0.07);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 34px;
+      flex-shrink: 0;
+      overflow: hidden;
+    }
+    .product-img img { width: 100%; height: 100%; object-fit: cover; }
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      padding: 4px 10px;
+      border-radius: 20px;
+      font-size: 10px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+    .badge-dot { width: 6px; height: 6px; border-radius: 50%; background: currentColor; }
+    .hero-bg {
+      position: relative;
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 24px;
+      background: linear-gradient(180deg, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.92) 60%, rgba(10,10,10,0.98) 100%),
+                  url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&q=80') center/cover no-repeat;
+    }
+    .header-bar {
+      padding: 14px 20px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      border-bottom: 1px solid rgba(212,175,55,0.12);
+      background: rgba(10,10,10,0.95);
+      backdrop-filter: blur(10px);
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    .back-btn {
+      background: none;
+      border: none;
+      color: #d4af37;
+      font-size: 26px;
+      cursor: pointer;
+      padding: 4px;
+      line-height: 1;
+      transition: transform 0.2s;
+    }
+    .back-btn:hover { transform: translateX(-3px); }
+    .section-title {
+      text-align: center;
+      font-size: 22px;
+      font-weight: 300;
+      letter-spacing: 5px;
+      color: #d4af37;
+      text-transform: uppercase;
+      font-family: 'Playfair Display', serif;
+    }
+    .gold-line {
+      width: 40px;
+      height: 2px;
+      background: #d4af37;
+      margin: 0 auto;
+    }
+    .footer-bar {
+      padding: 18px 20px;
+      border-top: 1px solid rgba(212,175,55,0.08);
+      text-align: center;
+    }
+    .social-link {
+      color: rgba(245,240,230,0.5);
+      text-decoration: none;
+      font-size: 11px;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: color 0.2s;
+    }
+    .social-link:hover { color: #d4af37; }
+    #loading {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(10,10,10,0.97);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+      transition: opacity 0.4s;
+    }
+    .loader {
+      width: 40px;
+      height: 40px;
+      border: 2px solid rgba(212,175,55,0.15);
+      border-top-color: #d4af37;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .empty-state { text-align: center; padding: 50px 20px; color: rgba(245,240,230,0.35); }
+    .empty-state-icon { font-size: 40px; margin-bottom: 14px; opacity: 0.5; }
+  </style>
+</head>
+<body>
+<div id="app">
+
+  <!-- ===== SCREEN: HERO ===== -->
+  <div id="screen-hero" class="screen active">
+    <div class="hero-bg">
+      <div style="text-align: center; padding-top: 30px;">
+        <div style="display: inline-block; border: 1px solid rgba(212,175,55,0.35); padding: 6px 22px; margin-bottom: 10px;">
+          <span style="font-size: 10px; letter-spacing: 5px; color: #d4af37; text-transform: uppercase; font-weight: 500;">Lounge</span>
+        </div>
+        <h1 class="font-display" style="font-size: 56px; font-weight: 300; letter-spacing: 10px; color: #f5f0e6; margin: 0; line-height: 1;">Seven</h1>
+        <div style="width: 100px; height: 2px; background: #d4af37; margin: 10px auto;"></div>
+        <p style="font-size: 10px; letter-spacing: 6px; color: #d4af37; text-transform: uppercase; margin-top: 6px; font-weight: 500;">Tragos & Piqueos</p>
+      </div>
+
+      <div style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
+        <p style="font-size: 12px; letter-spacing: 4px; color: rgba(245,240,230,0.6); text-transform: uppercase; margin-bottom: 18px; font-weight: 300;">Menú Digital</p>
+        <div style="width: 50px; height: 1px; background: rgba(212,175,55,0.4); margin: 0 auto 24px;"></div>
+        <div style="width: 150px; height: 150px; border-radius: 50%; border: 1px solid rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); backdrop-filter: blur(4px);">
+          <span style="font-size: 56px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));">🥃</span>
+        </div>
+      </div>
+
+      <div style="text-align: center; padding-bottom: 36px;">
+        <p style="font-size: 11px; letter-spacing: 3px; color: rgba(245,240,230,0.5); text-transform: uppercase; margin-bottom: 18px;">Descubre nuestro menú</p>
+        <button class="btn-gold" onclick="showScreen('screen-categories')">Entrar</button>
+        <div style="margin-top: 18px; font-size: 22px; color: #d4af37; animation: bounce 2s infinite; opacity: 0.7;">⌄</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: CATEGORIES ===== -->
+  <div id="screen-categories" class="screen">
+    <div class="header-bar">
+      <button class="back-btn" onclick="showScreen('screen-hero')">‹</button>
+      <div style="text-align: center;">
+        <p style="font-size: 8px; letter-spacing: 4px; color: #d4af37; margin: 0; font-weight: 500;">LOUNGE</p>
+        <h2 class="font-display" style="font-size: 18px; font-weight: 300; letter-spacing: 5px; color: #f5f0e6; margin: 2px 0 0;">Seven</h2>
+      </div>
+      <div style="width: 28px;"></div>
+    </div>
+
+    <div style="padding: 28px 18px;">
+      <h3 class="section-title" style="margin-bottom: 10px;">Menú</h3>
+      <div class="gold-line" style="margin-bottom: 32px;"></div>
+
+      <div id="category-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
+
+      <div style="margin-top: 24px; padding: 16px; border: 1px solid rgba(212,175,55,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: rgba(212,175,55,0.02); transition: all 0.2s;" onmouseover="this.style.background='rgba(212,175,55,0.05)'" onmouseout="this.style.background='rgba(212,175,55,0.02)'" onclick="toggleShowAvailableOnly()">
+        <div style="display: flex; align-items: center; gap: 14px;">
+          <span style="font-size: 22px;">📋</span>
+          <div>
+            <p style="font-size: 13px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.3px;">Disponible / No Disponible</p>
+            <p style="font-size: 11px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">Revisa el estado de cada producto</p>
+          </div>
+        </div>
+        <div id="avail-toggle-indicator" style="width: 10px; height: 10px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.4); transition: all 0.3s;"></div>
+      </div>
+    </div>
+
+    <div class="footer-bar" style="display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;">
+      <a href="https://instagram.com/sevenlounge_cmg" target="_blank" class="social-link">
+        <span>📷</span> Síguenos en Instagram
+      </a>
+      <a href="https://wa.me/5355555555" target="_blank" class="social-link">
+        <span>💬</span> Reserva o consulta
+      </a>
+    </div>
+  </div>
+
+  <!-- ===== SCREEN: PRODUCTS ===== -->
+  <div id="screen-products" class="screen">
+    <div class="header-bar">
+      <button class="back-btn" onclick="showScreen('screen-categories')">‹</button>
+      <div style="text-align: center; flex: 1;">
+        <p style="font-size: 8px; letter-spacing: 4px; color: #d4af37; margin: 0; font-weight: 500;">LOUNGE</p>
+        <h2 class="font-display" style="font-size: 16px; font-weight: 300; letter-spacing: 4px; color: #f5f0e6; margin: 2px 0 0;">Seven</h2>
+      </div>
+      <div style="width: 28px;"></div>
+    </div>
+
+    <div style="padding: 22px 16px;">
+      <h3 id="category-title" class="section-title" style="font-size: 20px; margin-bottom: 8px;"></h3>
+      <div class="gold-line" style="margin-bottom: 24px;"></div>
+      <div id="product-list" style="display: flex; flex-direction: column; gap: 14px;"></div>
+    </div>
+
+    <div class="footer-bar">
+      <p id="category-footer" style="font-size: 11px; color: rgba(245,240,230,0.4); margin: 0; line-height: 1.5;"></p>
+    </div>
+  </div>
+
+  <!-- ===== LOADING ===== -->
+  <div id="loading">
+    <div class="loader" style="margin-bottom: 18px;"></div>
+    <p style="font-size: 11px; letter-spacing: 4px; color: #d4af37; text-transform: uppercase; font-weight: 500;">Cargando menú...</p>
+  </div>
+
+</div>
+
+<script>
+  // ═══════════════════════════════════════
+  // CONFIGURACIÓN - REEMPLAZA ESTO
+  // ═══════════════════════════════════════
+  const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbzF5dKF-E7VQbKTMawiOK9ixzAbTsUNqqEVDb1iVszelTqE8cUrlR2RP6zcS0L1iVDF/exec'; // <-- Pega aquí tu URL de Apps Script
+  const DEMO_MODE = false;       // <-- Cambia a false cuando conectes Sheets
+
+  // ═══════════════════════════════════════
+  // DATOS DEMO (misma estructura que Sheets)
+  // ═══════════════════════════════════════
+  const demoData = [
+    { categoria: 'Cócteles', nombre: 'New York Sour', descripcion: 'Bourbon, limón, sirope simple y vino tinto.', precio: 550, disponible: true, imagen: '🥃' },
+    { categoria: 'Cócteles', nombre: 'Mojito', descripcion: 'Ron, hierbabuena, limón, azúcar y soda.', precio: 450, disponible: true, imagen: '🍹' },
+    { categoria: 'Cócteles', nombre: 'Daiquirí', descripcion: 'Ron, limón y azúcar.', precio: 450, disponible: true, imagen: '🍸' },
+    { categoria: 'Cócteles', nombre: 'Cuba Libre', descripcion: 'Ron, cola y limón.', precio: 400, disponible: false, imagen: '🥃' },
+    { categoria: 'Cócteles', nombre: 'Margarita', descripcion: 'Tequila, triple sec y limón.', precio: 480, disponible: true, imagen: '🍸' },
+    { categoria: 'Cócteles', nombre: 'Old Fashioned', descripcion: 'Bourbon, azúcar, angostura y cáscara de naranja.', precio: 520, disponible: true, imagen: '🥃' },
+    { categoria: 'Cócteles', nombre: 'Negroni', descripcion: 'Gin, Campari y vermut rojo.', precio: 500, disponible: true, imagen: '🍸' },
+    { categoria: 'Cócteles', nombre: 'Espresso Martini', descripcion: 'Vodka, café expreso, licor de café.', precio: 550, disponible: false, imagen: '🍸' },
+
+    { categoria: 'Licores & Tragos', nombre: 'Whisky Johnnie Walker Red Label', descripcion: '', precio: 500, disponible: true, imagen: '🥃' },
+    { categoria: 'Licores & Tragos', nombre: 'Whisky Johnnie Walker Black Label', descripcion: '', precio: 700, disponible: true, imagen: '🥃' },
+    { categoria: 'Licores & Tragos', nombre: 'Ron Havana Club 3 Años', descripcion: '', precio: 450, disponible: true, imagen: '🍶' },
+    { categoria: 'Licores & Tragos', nombre: 'Ron Havana Club 7 Años', descripcion: '', precio: 650, disponible: true, imagen: '🍶' },
+    { categoria: 'Licores & Tragos', nombre: 'Ron Havana Club 15 Años', descripcion: 'Edición Gran Reserva.', precio: 1200, disponible: true, imagen: '🍶' },
+    { categoria: 'Licores & Tragos', nombre: 'Vodka Absolut', descripcion: '', precio: 450, disponible: false, imagen: '🍸' },
+    { categoria: 'Licores & Tragos', nombre: 'Vodka Grey Goose', descripcion: '', precio: 700, disponible: true, imagen: '🍸' },
+    { categoria: 'Licores & Tragos', nombre: 'Tequila Jose Cuervo Especial', descripcion: '', precio: 450, disponible: true, imagen: '🥃' },
+    { categoria: 'Licores & Tragos', nombre: 'Tequila Don Julio 70', descripcion: 'Añejo cristalino.', precio: 950, disponible: true, imagen: '🥃' },
+    { categoria: 'Licores & Tragos', nombre: 'Jägermeister', descripcion: '', precio: 550, disponible: false, imagen: '🍶' },
+    { categoria: 'Licores & Tragos', nombre: 'Gin Bombay Sapphire', descripcion: '', precio: 600, disponible: true, imagen: '🍸' },
+    { categoria: 'Licores & Tragos', nombre: 'Gin Tanqueray', descripcion: '', precio: 550, disponible: true, imagen: '🍸' },
+
+    { categoria: 'Cervezas', nombre: 'Cerveza Cristal', descripcion: 'Nacional. 355ml.', precio: 250, disponible: true, imagen: '🍺' },
+    { categoria: 'Cervezas', nombre: 'Cerveza Bucanero', descripcion: 'Nacional. 355ml.', precio: 250, disponible: true, imagen: '🍺' },
+    { categoria: 'Cervezas', nombre: 'Heineken', descripcion: 'Importada. 330ml.', precio: 400, disponible: true, imagen: '🍺' },
+    { categoria: 'Cervezas', nombre: 'Corona Extra', descripcion: 'Importada. 355ml.', precio: 400, disponible: true, imagen: '🍺' },
+    { categoria: 'Cervezas', nombre: 'Stella Artois', descripcion: 'Importada. 330ml.', precio: 450, disponible: false, imagen: '🍺' },
+
+    { categoria: 'Piqueos', nombre: 'Papas Seven', descripcion: 'Papas fritas con queso, tocino y salsa de la casa.', precio: 450, disponible: true, imagen: '🍟' },
+    { categoria: 'Piqueos', nombre: 'Chicken Wings', descripcion: 'Alitas de pollo en salsa BBQ o picante. 8 unidades.', precio: 550, disponible: true, imagen: '🍗' },
+    { categoria: 'Piqueos', nombre: 'Tostones', descripcion: 'Tostones crujientes con salsa de ajo.', precio: 350, disponible: true, imagen: '🍘' },
+    { categoria: 'Piqueos', nombre: 'Atún Sellado', descripcion: 'Atún sellado con reducción balsámica y ajonjolí.', precio: 700, disponible: false, imagen: '🐟' },
+    { categoria: 'Piqueos', nombre: 'Tabla de Quesos', descripcion: 'Selección de quesos, frutos secos y miel.', precio: 650, disponible: true, imagen: '🧀' },
+    { categoria: 'Piqueos', nombre: 'Nachos Supremos', descripcion: 'Nachos con queso cheddar, jalapeños, guacamole y sour cream.', precio: 500, disponible: true, imagen: '🌮' },
+    { categoria: 'Piqueos', nombre: 'Carpaccio de Res', descripcion: 'Láminas finas de res con aceite de oliva, limón y alcaparras.', precio: 750, disponible: true, imagen: '🥩' },
+    { categoria: 'Piqueos', nombre: 'Bruschettas', descripcion: 'Pan tostado con tomate, albahaca y aceite de oliva.', precio: 380, disponible: true, imagen: '🥖' },
+
+    { categoria: 'Sin Alcohol', nombre: 'Virgin Mojito', descripcion: 'Hierbabuena, limón, azúcar, soda.', precio: 300, disponible: true, imagen: '🍹' },
+    { categoria: 'Sin Alcohol', nombre: 'Limonada Frozen', descripcion: 'Limón natural y sirope.', precio: 300, disponible: true, imagen: '🍋' },
+    { categoria: 'Sin Alcohol', nombre: 'Frutos Rojos', descripcion: 'Mezcla de frutos rojos y soda.', precio: 300, disponible: true, imagen: '🍓' },
+    { categoria: 'Sin Alcohol', nombre: 'Agua Mineral', descripcion: '500ml.', precio: 150, disponible: true, imagen: '💧' },
+    { categoria: 'Sin Alcohol', nombre: 'Jugo Natural', descripcion: 'Maracuyá, piña o mango.', precio: 250, disponible: true, imagen: '🧃' },
+    { categoria: 'Sin Alcohol', nombre: 'Té Helado', descripcion: 'Limón o durazno.', precio: 200, disponible: true, imagen: '🧊' },
+
+    { categoria: 'Especiales', nombre: 'Trago de la Casa', descripcion: 'Especialidad del bartender. Cambia cada semana.', precio: 500, disponible: true, imagen: '✨' },
+    { categoria: 'Especiales', nombre: 'Seven Signature', descripcion: 'Nuestra creación exclusiva con ron añejo y especias.', precio: 600, disponible: true, imagen: '🔥' },
+    { categoria: 'Especiales', nombre: 'Botella Premium del Mes', descripcion: 'Consulta con el mesero.', precio: 0, disponible: true, imagen: '🏆' },
+  ];
+
+  const categoryIcons = {
+    'Cócteles': '🍸',
+    'Licores & Tragos': '🥃',
+    'Cervezas': '🍺',
+    'Piqueos': '🍽️',
+    'Sin Alcohol': '🥤',
+    'Especiales': '⭐'
+  };
+
+  const categoryDescriptions = {
+    'Cócteles': 'Clásicos y de autor',
+    'Licores & Tragos': 'Destilados premium',
+    'Cervezas': 'Nacionales e importadas',
+    'Piqueos': 'Para compartir',
+    'Sin Alcohol': 'Refrescos y mocktails',
+    'Especiales': 'De la casa'
+  };
+
+  const categoryFooters = {
+    'Cócteles': 'Nuestros cócteles pueden variar según disponibilidad de ingredientes.',
+    'Licores & Tragos': 'Pregunta por nuestras botellas premium.',
+    'Cervezas': 'Siempre bien frías.',
+    'Piqueos': 'Perfectos para compartir.',
+    'Sin Alcohol': '¡Pregúntanos por más opciones!',
+    'Especiales': 'Edición limitada, pregunta al mesero.'
+  };
+
+  let menuData = [];
+  let showAvailableOnly = false;
+  let currentCategory = '';
+
+  // ═══════════════════════════════════════
+  // FUNCIONES
+  // ═══════════════════════════════════════
+  async function loadMenu() {
+    const loader = document.getElementById('loading');
+    loader.style.opacity = '1';
+    loader.style.display = 'flex';
+
+    if (DEMO_MODE || !GOOGLE_SHEETS_URL) {
+      await new Promise(r => setTimeout(r, 900));
+      menuData = [...demoData];
+    } else {
+      try {
+        const response = await fetch(GOOGLE_SHEETS_URL);
+        menuData = await response.json();
+      } catch (e) {
+        console.error('Error cargando Google Sheets:', e);
+        menuData = [...demoData];
+      }
+    }
+
+    loader.style.opacity = '0';
+    setTimeout(() => { loader.style.display = 'none'; }, 400);
+    renderCategories();
+  }
+
+  function renderCategories() {
+    const container = document.getElementById('category-list');
+    const categories = [...new Set(menuData.map(item => item.categoria))];
+
+    container.innerHTML = categories.map(cat => {
+      const items = menuData.filter(i => i.categoria === cat);
+      const available = items.filter(i => i.disponible).length;
+      const total = items.length;
+      return `
+        <div class="category-card" onclick="showCategory('${cat}')">
+          <div style="display: flex; align-items: center; gap: 14px;">
+            <span style="font-size: 24px;">${categoryIcons[cat] || '📋'}</span>
+            <div>
+              <p style="font-size: 14px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.5px;">${cat}</p>
+              <p style="font-size: 11px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">${categoryDescriptions[cat] || ''}</p>
+            </div>
+          </div>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <span style="font-size: 11px; color: rgba(245,240,230,0.35); font-weight: 500;">${available}/${total}</span>
+            <span style="color: #d4af37; font-size: 20px; font-weight: 300;">›</span>
+          </div>
+        </div>
+      `;
+    }).join('');
+  }
+
+  function showCategory(category) {
+    currentCategory = category;
+    document.getElementById('category-title').textContent = category;
+    document.getElementById('category-footer').textContent = categoryFooters[category] || '';
+
+    const container = document.getElementById('product-list');
+    let items = menuData.filter(i => i.categoria === category);
+
+    if (showAvailableOnly) {
+      items = items.filter(i => i.disponible);
+    }
+
+    if (items.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          <div class="empty-state-icon">😔</div>
+          <p style="font-size: 14px;">No hay productos disponibles en esta categoría.</p>
+          <p style="font-size: 12px; margin-top: 8px; color: rgba(245,240,230,0.25);">Intenta desactivar el filtro de disponibilidad.</p>
+        </div>
+      `;
+    } else {
+      container.innerHTML = items.map((item, idx) => {
+        const isUrl = item.imagen && item.imagen.startsWith('http');
+        const imgContent = isUrl
+          ? `<img src="${item.imagen}" alt="${item.nombre}" loading="lazy">`
+          : `<span>${item.imagen || '🍽️'}</span>`;
+
+        return `
+        <div class="product-card" style="animation-delay: ${idx * 0.06}s;">
+          <div style="display: flex; gap: 14px; padding: 14px; border: 1px solid rgba(212,175,55,0.1); border-radius: 12px; background: rgba(255,255,255,0.015);">
+            <div class="product-img">${imgContent}</div>
+            <div style="flex: 1; min-width: 0;">
+              <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
+                <h4 style="font-size: 14px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.3px; line-height: 1.3;">${item.nombre}</h4>
+                <span style="font-size: 15px; color: #d4af37; font-weight: 600; white-space: nowrap; font-family: 'Inter', sans-serif;">${item.precio > 0 ? '$' + item.precio : 'Consultar'}</span>
+              </div>
+              ${item.descripcion ? `<p style="font-size: 12px; color: rgba(245,240,230,0.5); margin: 6px 0 0; line-height: 1.45;">${item.descripcion}</p>` : ''}
+              <div style="margin-top: 10px;">
+                <span class="badge ${item.disponible ? 'available' : 'unavailable'}">
+                  <span class="badge-dot"></span>
+                  ${item.disponible ? 'Disponible' : 'No Disponible'}
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      `;}).join('');
+    }
+
+    showScreen('screen-products');
+  }
+
+  function toggleShowAvailableOnly() {
+    showAvailableOnly = !showAvailableOnly;
+    const indicator = document.getElementById('avail-toggle-indicator');
+    indicator.style.background = showAvailableOnly ? '#f87171' : '#4ade80';
+    indicator.style.boxShadow = showAvailableOnly ? '0 0 8px rgba(248,113,113,0.4)' : '0 0 8px rgba(74,222,128,0.4)';
+
+    if (currentCategory && document.getElementById('screen-products').classList.contains('active')) {
+      showCategory(currentCategory);
+    }
+  }
+
+  function showScreen(screenId) {
+    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+    document.getElementById(screenId).classList.add('active');
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  // ═══════════════════════════════════════
+  // INIT
+  // ═══════════════════════════════════════
+  loadMenu();
+</script>
+</body>
+</html>
