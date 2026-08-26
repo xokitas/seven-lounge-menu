@@ -269,6 +269,7 @@
     }
   </style>
 <base target="_blank">
+<base target="_blank">
 </head>
 <body>
 <div id="app">
@@ -498,12 +499,12 @@
           <div style="display: flex; align-items: center; gap: 14px;">
             <span style="font-size: 24px;">${categoryIcons[cat] || '📋'}</span>
             <div>
-              <p style="font-size: 16px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.5px;">${cat}</p>
-              <p style="font-size: 13px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">${categoryDescriptions[cat] || ''}</p>
+              <p class="font-display" style="font-size: 18px; color: #d4af37; margin: 0; font-weight: 400; letter-spacing: 1px;">${cat}</p>
+              <p style="font-size: 13px; color: rgba(245,240,230,0.7); margin: 4px 0 0; font-weight: 300; letter-spacing: 0.3px;">${categoryDescriptions[cat] || ''}</p>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 13px; color: rgba(245,240,230,0.35); font-weight: 500;">${available}/${total}</span>
+            <span style="font-size: 12px; color: rgba(245,240,230,0.3); font-weight: 400; font-family: 'Playfair Display', serif; letter-spacing: 1px;">${available}/${total}</span>
             <span style="color: #d4af37; font-size: 20px; font-weight: 300;">›</span>
           </div>
         </div>
@@ -539,16 +540,16 @@
           : `<span>${item.imagen || '🍽️'}</span>`;
 
         return `
-        <div class="product-card" style="animation-delay: ${idx * 0.06}s;">
-          <div style="display: flex; gap: 14px; padding: 14px; border: 1px solid rgba(212,175,55,0.1); border-radius: 12px; background: rgba(255,255,255,0.015);">
-            <div class="product-img" onclick="openModal('${item.imagen || ''}', '${item.nombre.replace(/'/g, "\'")}')" style="cursor: pointer;">${imgContent}</div>
+        <div class="product-card" style="animation-delay: ${idx * 0.06}s; cursor: pointer;" onclick="openModal('${(item.imagen || '').replace(/'/g, "\'")}', '${item.nombre.replace(/'/g, "\'")}')">
+          <div style="display: flex; gap: 14px; padding: 14px; border: 1px solid rgba(212,175,55,0.08); border-radius: 12px; background: rgba(255,255,255,0.02);">
+            <div class="product-img">${imgContent}</div>
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-                <h4 style="font-size: 16px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.3px; line-height: 1.3;">${item.nombre}</h4>
-                <span style="font-size: 17px; color: #d4af37; font-weight: 600; white-space: nowrap; font-family: 'Inter', sans-serif;">${item.precio > 0 ? '$' + item.precio : 'Consultar'}</span>
+                <h4 class="font-display" style="font-size: 17px; color: #d4af37; margin: 0; font-weight: 400; letter-spacing: 0.8px; line-height: 1.25;">${item.nombre}</h4>
+                <span class="font-display" style="font-size: 18px; color: #d4af37; font-weight: 400; white-space: nowrap; letter-spacing: 1px;">${item.precio > 0 ? '$' + item.precio : 'Consultar'}</span>
               </div>
-              ${item.descripcion ? `<p style="font-size: 14px; color: rgba(245,240,230,0.5); margin: 6px 0 0; line-height: 1.45;">${item.descripcion}</p>` : ''}
-              <div style="margin-top: 10px;">
+              ${item.descripcion ? `<p style="font-size: 14px; color: rgba(245,240,230,0.75); margin: 8px 0 0; line-height: 1.5; font-weight: 300;">${item.descripcion}</p>` : ''}
+              <div style="margin-top: 12px;">
                 <span class="badge ${item.disponible ? 'available' : 'unavailable'}">
                   <span class="badge-dot"></span>
                   ${item.disponible ? 'Disponible' : 'No Disponible'}
@@ -580,17 +581,17 @@
     const modal = document.getElementById('product-modal');
     const body = document.getElementById('modal-body');
     const title = document.getElementById('modal-title');
-    const isUrl = imagen && imagen.startsWith('http');
+
+    // Sanitizar inputs
+    imagen = imagen || '';
+    nombre = nombre || 'Producto';
+
+    const isUrl = imagen.startsWith('http');
 
     if (isUrl) {
-      body.innerHTML = `<img src="${imagen}" alt="${nombre}">`;
+      body.innerHTML = '<img src="' + imagen + '" alt="' + nombre.replace(/"/g, '&quot;') + '">';
     } else {
-      body.innerHTML = `
-        <div class="modal-no-photo">
-          <span>${imagen || '🍽️'}</span>
-          <p>No hay foto disponible</p>
-        </div>
-      `;
+      body.innerHTML = '<div class="modal-no-photo"><span>' + (imagen || '🍽️') + '</span><p>No hay foto disponible</p></div>';
     }
     title.textContent = nombre;
     modal.classList.add('active');
