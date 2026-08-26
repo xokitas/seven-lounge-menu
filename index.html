@@ -97,7 +97,7 @@
       gap: 5px;
       padding: 4px 10px;
       border-radius: 20px;
-      font-size: 10px;
+      font-size: 12px;
       font-weight: 600;
       letter-spacing: 0.5px;
       text-transform: uppercase;
@@ -111,7 +111,7 @@
       justify-content: space-between;
       padding: 24px;
       background: linear-gradient(180deg, rgba(10,10,10,0.2) 0%, rgba(10,10,10,0.92) 60%, rgba(10,10,10,0.98) 100%),
-                  url('https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=800&q=80') center/cover no-repeat;
+                  url('https://i.imgur.com/086eumN.png') center/cover no-repeat;
     }
     .header-bar {
       padding: 14px 20px;
@@ -159,7 +159,7 @@
     .social-link {
       color: rgba(245,240,230,0.5);
       text-decoration: none;
-      font-size: 11px;
+      font-size: 13px;
       display: inline-flex;
       align-items: center;
       gap: 6px;
@@ -189,6 +189,7 @@
     .empty-state { text-align: center; padding: 50px 20px; color: rgba(245,240,230,0.35); }
     .empty-state-icon { font-size: 40px; margin-bottom: 14px; opacity: 0.5; }
   </style>
+<base target="_blank">
 </head>
 <body>
 <div id="app">
@@ -208,13 +209,11 @@
       <div style="text-align: center; flex: 1; display: flex; flex-direction: column; justify-content: center; align-items: center;">
         <p style="font-size: 12px; letter-spacing: 4px; color: rgba(245,240,230,0.6); text-transform: uppercase; margin-bottom: 18px; font-weight: 300;">Menú Digital</p>
         <div style="width: 50px; height: 1px; background: rgba(212,175,55,0.4); margin: 0 auto 24px;"></div>
-        <div style="width: 150px; height: 150px; border-radius: 50%; border: 1px solid rgba(212,175,55,0.2); display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.25); backdrop-filter: blur(4px);">
-          <span style="font-size: 56px; filter: drop-shadow(0 4px 12px rgba(0,0,0,0.5));">🥃</span>
-        </div>
+        
       </div>
 
       <div style="text-align: center; padding-bottom: 36px;">
-        <p style="font-size: 11px; letter-spacing: 3px; color: rgba(245,240,230,0.5); text-transform: uppercase; margin-bottom: 18px;">Descubre nuestro menú</p>
+        <p style="font-size: 11px; letter-spacing: 3px; color: rgba(245,240,230,0.5); text-transform: uppercase; margin-bottom: 18px;">Descubre nuestras ofertas</p>
         <button class="btn-gold" onclick="showScreen('screen-categories')">Entrar</button>
         <div style="margin-top: 18px; font-size: 22px; color: #d4af37; animation: bounce 2s infinite; opacity: 0.7;">⌄</div>
       </div>
@@ -226,8 +225,8 @@
     <div class="header-bar">
       <button class="back-btn" onclick="showScreen('screen-hero')">‹</button>
       <div style="text-align: center;">
-        <p style="font-size: 8px; letter-spacing: 4px; color: #d4af37; margin: 0; font-weight: 500;">LOUNGE</p>
-        <h2 class="font-display" style="font-size: 18px; font-weight: 300; letter-spacing: 5px; color: #f5f0e6; margin: 2px 0 0;">Seven</h2>
+        <p style="font-size: 10px; letter-spacing: 4px; color: #d4af37; margin: 0; font-weight: 500;">LOUNGE</p>
+        <h2 class="font-display" style="font-size: 20px; font-weight: 300; letter-spacing: 5px; color: #f5f0e6; margin: 2px 0 0;">Seven</h2>
       </div>
       <div style="width: 28px;"></div>
     </div>
@@ -238,16 +237,7 @@
 
       <div id="category-list" style="display: flex; flex-direction: column; gap: 12px;"></div>
 
-      <div style="margin-top: 24px; padding: 16px; border: 1px solid rgba(212,175,55,0.15); border-radius: 12px; display: flex; align-items: center; justify-content: space-between; cursor: pointer; background: rgba(212,175,55,0.02); transition: all 0.2s;" onmouseover="this.style.background='rgba(212,175,55,0.05)'" onmouseout="this.style.background='rgba(212,175,55,0.02)'" onclick="toggleShowAvailableOnly()">
-        <div style="display: flex; align-items: center; gap: 14px;">
-          <span style="font-size: 22px;">📋</span>
-          <div>
-            <p style="font-size: 13px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.3px;">Disponible / No Disponible</p>
-            <p style="font-size: 11px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">Revisa el estado de cada producto</p>
-          </div>
-        </div>
-        <div id="avail-toggle-indicator" style="width: 10px; height: 10px; border-radius: 50%; background: #4ade80; box-shadow: 0 0 8px rgba(74,222,128,0.4); transition: all 0.3s;"></div>
-      </div>
+      
     </div>
 
     <div class="footer-bar" style="display: flex; justify-content: center; gap: 32px; flex-wrap: wrap;">
@@ -265,8 +255,8 @@
     <div class="header-bar">
       <button class="back-btn" onclick="showScreen('screen-categories')">‹</button>
       <div style="text-align: center; flex: 1;">
-        <p style="font-size: 8px; letter-spacing: 4px; color: #d4af37; margin: 0; font-weight: 500;">LOUNGE</p>
-        <h2 class="font-display" style="font-size: 16px; font-weight: 300; letter-spacing: 4px; color: #f5f0e6; margin: 2px 0 0;">Seven</h2>
+        <p style="font-size: 10px; letter-spacing: 4px; color: #d4af37; margin: 0; font-weight: 500;">LOUNGE</p>
+        <h2 class="font-display" style="font-size: 18px; font-weight: 300; letter-spacing: 4px; color: #f5f0e6; margin: 2px 0 0;">Seven</h2>
       </div>
       <div style="width: 28px;"></div>
     </div>
@@ -278,14 +268,14 @@
     </div>
 
     <div class="footer-bar">
-      <p id="category-footer" style="font-size: 11px; color: rgba(245,240,230,0.4); margin: 0; line-height: 1.5;"></p>
+      <p id="category-footer" style="font-size: 13px; color: rgba(245,240,230,0.4); margin: 0; line-height: 1.5;"></p>
     </div>
   </div>
 
   <!-- ===== LOADING ===== -->
   <div id="loading">
     <div class="loader" style="margin-bottom: 18px;"></div>
-    <p style="font-size: 11px; letter-spacing: 4px; color: #d4af37; text-transform: uppercase; font-weight: 500;">Cargando menú...</p>
+    <p style="font-size: 13px; letter-spacing: 4px; color: #d4af37; text-transform: uppercase; font-weight: 500;">Cargando menú...</p>
   </div>
 
 </div>
@@ -420,12 +410,12 @@
           <div style="display: flex; align-items: center; gap: 14px;">
             <span style="font-size: 24px;">${categoryIcons[cat] || '📋'}</span>
             <div>
-              <p style="font-size: 14px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.5px;">${cat}</p>
-              <p style="font-size: 11px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">${categoryDescriptions[cat] || ''}</p>
+              <p style="font-size: 16px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.5px;">${cat}</p>
+              <p style="font-size: 13px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">${categoryDescriptions[cat] || ''}</p>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 11px; color: rgba(245,240,230,0.35); font-weight: 500;">${available}/${total}</span>
+            <span style="font-size: 13px; color: rgba(245,240,230,0.35); font-weight: 500;">${available}/${total}</span>
             <span style="color: #d4af37; font-size: 20px; font-weight: 300;">›</span>
           </div>
         </div>
@@ -466,10 +456,10 @@
             <div class="product-img">${imgContent}</div>
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-                <h4 style="font-size: 14px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.3px; line-height: 1.3;">${item.nombre}</h4>
-                <span style="font-size: 15px; color: #d4af37; font-weight: 600; white-space: nowrap; font-family: 'Inter', sans-serif;">${item.precio > 0 ? '$' + item.precio : 'Consultar'}</span>
+                <h4 style="font-size: 16px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.3px; line-height: 1.3;">${item.nombre}</h4>
+                <span style="font-size: 17px; color: #d4af37; font-weight: 600; white-space: nowrap; font-family: 'Inter', sans-serif;">${item.precio > 0 ? '$' + item.precio : 'Consultar'}</span>
               </div>
-              ${item.descripcion ? `<p style="font-size: 12px; color: rgba(245,240,230,0.5); margin: 6px 0 0; line-height: 1.45;">${item.descripcion}</p>` : ''}
+              ${item.descripcion ? `<p style="font-size: 14px; color: rgba(245,240,230,0.5); margin: 6px 0 0; line-height: 1.45;">${item.descripcion}</p>` : ''}
               <div style="margin-top: 10px;">
                 <span class="badge ${item.disponible ? 'available' : 'unavailable'}">
                   <span class="badge-dot"></span>
