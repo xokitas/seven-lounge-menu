@@ -267,6 +267,85 @@
       font-size: 13px;
       letter-spacing: 0.5px;
     }
+
+    /* ===== MODAL / LIGHTBOX ===== */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(5,5,5,0.92);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: 20px;
+    }
+    .modal-overlay.active {
+      opacity: 1;
+      pointer-events: all;
+    }
+    .modal-content {
+      position: relative;
+      max-width: 100%;
+      max-height: 80vh;
+      border-radius: 12px;
+      overflow: hidden;
+      transform: scale(0.9);
+      transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+    }
+    .modal-overlay.active .modal-content {
+      transform: scale(1);
+    }
+    .modal-content img {
+      max-width: 100%;
+      max-height: 70vh;
+      display: block;
+      border-radius: 12px;
+      object-fit: contain;
+    }
+    .modal-close {
+      position: absolute;
+      top: -40px;
+      right: 0;
+      background: none;
+      border: none;
+      color: #d4af37;
+      font-size: 32px;
+      cursor: pointer;
+      line-height: 1;
+      padding: 4px;
+      font-family: 'Inter', sans-serif;
+    }
+    .modal-title {
+      text-align: center;
+      color: #f5f0e6;
+      font-size: 16px;
+      margin-top: 16px;
+      font-weight: 500;
+      letter-spacing: 1px;
+    }
+    .modal-no-photo {
+      width: 200px;
+      height: 200px;
+      border-radius: 12px;
+      background: rgba(212,175,55,0.06);
+      border: 1px solid rgba(212,175,55,0.15);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 30px;
+      text-align: center;
+    }
+    .modal-no-photo span { font-size: 48px; }
+    .modal-no-photo p {
+      color: rgba(245,240,230,0.5);
+      font-size: 13px;
+      letter-spacing: 0.5px;
+    }
   </style>
 <base target="_blank">
 <base target="_blank">
@@ -367,6 +446,15 @@
       <p id="modal-title" class="modal-title"></p>
     </div>
   </div>
+
+  <!-- ===== MODAL ===== -->
+  <div id="product-modal" class="modal-overlay" onclick="closeModal(event)">
+    <div class="modal-content" onclick="event.stopPropagation()">
+      <button class="modal-close" onclick="closeModal()">×</button>
+      <div id="modal-body"></div>
+      <p id="modal-title" class="modal-title"></p>
+    </div>
+  </div>
 </div>
 
 <script>
@@ -379,63 +467,18 @@
   // ═══════════════════════════════════════
   // DATOS DEMO (misma estructura que Sheets)
   // ═══════════════════════════════════════
-  const demoData = [
-    { categoria: 'Cócteles', nombre: 'New York Sour', descripcion: 'Bourbon, limón, sirope simple y vino tinto.', precio: 550, disponible: true, imagen: '🥃' },
-    { categoria: 'Cócteles', nombre: 'Mojito', descripcion: 'Ron, hierbabuena, limón, azúcar y soda.', precio: 450, disponible: true, imagen: '🍹' },
-    { categoria: 'Cócteles', nombre: 'Daiquirí', descripcion: 'Ron, limón y azúcar.', precio: 450, disponible: true, imagen: '🍸' },
-    { categoria: 'Cócteles', nombre: 'Cuba Libre', descripcion: 'Ron, cola y limón.', precio: 400, disponible: false, imagen: '🥃' },
-    { categoria: 'Cócteles', nombre: 'Margarita', descripcion: 'Tequila, triple sec y limón.', precio: 480, disponible: true, imagen: '🍸' },
-    { categoria: 'Cócteles', nombre: 'Old Fashioned', descripcion: 'Bourbon, azúcar, angostura y cáscara de naranja.', precio: 520, disponible: true, imagen: '🥃' },
-    { categoria: 'Cócteles', nombre: 'Negroni', descripcion: 'Gin, Campari y vermut rojo.', precio: 500, disponible: true, imagen: '🍸' },
-    { categoria: 'Cócteles', nombre: 'Espresso Martini', descripcion: 'Vodka, café expreso, licor de café.', precio: 550, disponible: false, imagen: '🍸' },
+  // demoData eliminado - solo Google Sheets
 
-    { categoria: 'Licores & Tragos', nombre: 'Whisky Johnnie Walker Red Label', descripcion: '', precio: 500, disponible: true, imagen: '🥃' },
-    { categoria: 'Licores & Tragos', nombre: 'Whisky Johnnie Walker Black Label', descripcion: '', precio: 700, disponible: true, imagen: '🥃' },
-    { categoria: 'Licores & Tragos', nombre: 'Ron Havana Club 3 Años', descripcion: '', precio: 450, disponible: true, imagen: '🍶' },
-    { categoria: 'Licores & Tragos', nombre: 'Ron Havana Club 7 Años', descripcion: '', precio: 650, disponible: true, imagen: '🍶' },
-    { categoria: 'Licores & Tragos', nombre: 'Ron Havana Club 15 Años', descripcion: 'Edición Gran Reserva.', precio: 1200, disponible: true, imagen: '🍶' },
-    { categoria: 'Licores & Tragos', nombre: 'Vodka Absolut', descripcion: '', precio: 450, disponible: false, imagen: '🍸' },
-    { categoria: 'Licores & Tragos', nombre: 'Vodka Grey Goose', descripcion: '', precio: 700, disponible: true, imagen: '🍸' },
-    { categoria: 'Licores & Tragos', nombre: 'Tequila Jose Cuervo Especial', descripcion: '', precio: 450, disponible: true, imagen: '🥃' },
-    { categoria: 'Licores & Tragos', nombre: 'Tequila Don Julio 70', descripcion: 'Añejo cristalino.', precio: 950, disponible: true, imagen: '🥃' },
-    { categoria: 'Licores & Tragos', nombre: 'Jägermeister', descripcion: '', precio: 550, disponible: false, imagen: '🍶' },
-    { categoria: 'Licores & Tragos', nombre: 'Gin Bombay Sapphire', descripcion: '', precio: 600, disponible: true, imagen: '🍸' },
-    { categoria: 'Licores & Tragos', nombre: 'Gin Tanqueray', descripcion: '', precio: 550, disponible: true, imagen: '🍸' },
-
-    { categoria: 'Cervezas', nombre: 'Cerveza Cristal', descripcion: 'Nacional. 355ml.', precio: 250, disponible: true, imagen: '🍺' },
-    { categoria: 'Cervezas', nombre: 'Cerveza Bucanero', descripcion: 'Nacional. 355ml.', precio: 250, disponible: true, imagen: '🍺' },
-    { categoria: 'Cervezas', nombre: 'Heineken', descripcion: 'Importada. 330ml.', precio: 400, disponible: true, imagen: '🍺' },
-    { categoria: 'Cervezas', nombre: 'Corona Extra', descripcion: 'Importada. 355ml.', precio: 400, disponible: true, imagen: '🍺' },
-    { categoria: 'Cervezas', nombre: 'Stella Artois', descripcion: 'Importada. 330ml.', precio: 450, disponible: false, imagen: '🍺' },
-
-    { categoria: 'Piqueos', nombre: 'Papas Seven', descripcion: 'Papas fritas con queso, tocino y salsa de la casa.', precio: 450, disponible: true, imagen: '🍟' },
-    { categoria: 'Piqueos', nombre: 'Chicken Wings', descripcion: 'Alitas de pollo en salsa BBQ o picante. 8 unidades.', precio: 550, disponible: true, imagen: '🍗' },
-    { categoria: 'Piqueos', nombre: 'Tostones', descripcion: 'Tostones crujientes con salsa de ajo.', precio: 350, disponible: true, imagen: '🍘' },
-    { categoria: 'Piqueos', nombre: 'Atún Sellado', descripcion: 'Atún sellado con reducción balsámica y ajonjolí.', precio: 700, disponible: false, imagen: '🐟' },
-    { categoria: 'Piqueos', nombre: 'Tabla de Quesos', descripcion: 'Selección de quesos, frutos secos y miel.', precio: 650, disponible: true, imagen: '🧀' },
-    { categoria: 'Piqueos', nombre: 'Nachos Supremos', descripcion: 'Nachos con queso cheddar, jalapeños, guacamole y sour cream.', precio: 500, disponible: true, imagen: '🌮' },
-    { categoria: 'Piqueos', nombre: 'Carpaccio de Res', descripcion: 'Láminas finas de res con aceite de oliva, limón y alcaparras.', precio: 750, disponible: true, imagen: '🥩' },
-    { categoria: 'Piqueos', nombre: 'Bruschettas', descripcion: 'Pan tostado con tomate, albahaca y aceite de oliva.', precio: 380, disponible: true, imagen: '🥖' },
-
-    { categoria: 'Sin Alcohol', nombre: 'Virgin Mojito', descripcion: 'Hierbabuena, limón, azúcar, soda.', precio: 300, disponible: true, imagen: '🍹' },
-    { categoria: 'Sin Alcohol', nombre: 'Limonada Frozen', descripcion: 'Limón natural y sirope.', precio: 300, disponible: true, imagen: '🍋' },
-    { categoria: 'Sin Alcohol', nombre: 'Frutos Rojos', descripcion: 'Mezcla de frutos rojos y soda.', precio: 300, disponible: true, imagen: '🍓' },
-    { categoria: 'Sin Alcohol', nombre: 'Agua Mineral', descripcion: '500ml.', precio: 150, disponible: true, imagen: '💧' },
-    { categoria: 'Sin Alcohol', nombre: 'Jugo Natural', descripcion: 'Maracuyá, piña o mango.', precio: 250, disponible: true, imagen: '🧃' },
-    { categoria: 'Sin Alcohol', nombre: 'Té Helado', descripcion: 'Limón o durazno.', precio: 200, disponible: true, imagen: '🧊' },
-
-    { categoria: 'Especiales', nombre: 'Trago de la Casa', descripcion: 'Especialidad del bartender. Cambia cada semana.', precio: 500, disponible: true, imagen: '✨' },
-    { categoria: 'Especiales', nombre: 'Seven Signature', descripcion: 'Nuestra creación exclusiva con ron añejo y especias.', precio: 600, disponible: true, imagen: '🔥' },
-    { categoria: 'Especiales', nombre: 'Botella Premium del Mes', descripcion: 'Consulta con el mesero.', precio: 0, disponible: true, imagen: '🏆' },
-  ];
 
   const categoryIcons = {
-    'Cócteles': '🍸',
-    'Licores & Tragos': '🥃',
-    'Cervezas': '🍺',
-    'Piqueos': '🍽️',
-    'Sin Alcohol': '🥤',
-    'Especiales': '⭐'
+    // Formato: { img: 'https://url.jpg', emoji: '🍸' }
+    // Si no tienes foto, deja img vacío: ''
+    'Cócteles': { img: '', emoji: '🍸' },
+    'Licores & Tragos': { img: '', emoji: '🥃' },
+    'Cervezas': { img: '', emoji: '🍺' },
+    'Piqueos': { img: '', emoji: '🍽️' },
+    'Sin Alcohol': { img: '', emoji: '🥤' },
+    'Especiales': { img: '', emoji: '⭐' }
   };
 
   const categoryDescriptions = {
@@ -465,25 +508,50 @@
   // ═══════════════════════════════════════
   async function loadMenu() {
     const loader = document.getElementById('loading');
-    loader.style.opacity = '1';
-    loader.style.display = 'flex';
+    const CACHE_KEY = 'seven_menu_cache';
 
-    if (DEMO_MODE || !GOOGLE_SHEETS_URL) {
-      await new Promise(r => setTimeout(r, 900));
-      menuData = [...demoData];
-    } else {
+    // 1. Mostrar cache INSTANTÁNEAMENTE si existe
+    const cached = localStorage.getItem(CACHE_KEY);
+    if (cached) {
       try {
-        const response = await fetch(GOOGLE_SHEETS_URL);
-        menuData = await response.json();
+        menuData = JSON.parse(cached);
+        renderCategories();
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.display = 'none'; }, 150);
       } catch (e) {
-        console.error('Error cargando Google Sheets:', e);
-        menuData = [...demoData];
+        localStorage.removeItem(CACHE_KEY);
       }
     }
 
-    loader.style.opacity = '0';
-    setTimeout(() => { loader.style.display = 'none'; }, 400);
-    renderCategories();
+    // 2. Si no hay URL configurada, mostrar error
+    if (!GOOGLE_SHEETS_URL || DEMO_MODE) {
+      if (!cached) {
+        loader.innerHTML = '<p style="color:#f87171;font-size:13px;">Configuración pendiente</p>';
+      }
+      return;
+    }
+
+    // 3. Actualizar desde Google Sheets en background
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), 4000);
+      const response = await fetch(GOOGLE_SHEETS_URL, { signal: controller.signal });
+      clearTimeout(timeoutId);
+
+      const freshData = await response.json();
+
+      // Solo actualizar si cambió algo
+      if (JSON.stringify(freshData) !== JSON.stringify(menuData)) {
+        menuData = freshData;
+        localStorage.setItem(CACHE_KEY, JSON.stringify(menuData));
+        renderCategories();
+      }
+    } catch (e) {
+      console.error('Error Sheets:', e);
+      if (!cached) {
+        loader.innerHTML = '<p style="color:#f87171;font-size:13px;">No se pudo cargar el menú</p>';
+      }
+    }
   }
 
   function renderCategories() {
@@ -499,12 +567,12 @@
           <div style="display: flex; align-items: center; gap: 14px;">
             <span style="font-size: 24px;">${categoryIcons[cat] || '📋'}</span>
             <div>
-              <p class="font-display" style="font-size: 18px; color: #d4af37; margin: 0; font-weight: 400; letter-spacing: 1px;">${cat}</p>
-              <p style="font-size: 13px; color: rgba(245,240,230,0.7); margin: 4px 0 0; font-weight: 300; letter-spacing: 0.3px;">${categoryDescriptions[cat] || ''}</p>
+              <p style="font-size: 16px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.5px;">${cat}</p>
+              <p style="font-size: 13px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">${categoryDescriptions[cat] || ''}</p>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 12px; color: rgba(245,240,230,0.3); font-weight: 400; font-family: 'Playfair Display', serif; letter-spacing: 1px;">${available}/${total}</span>
+            <span style="font-size: 13px; color: rgba(245,240,230,0.35); font-weight: 500;">${available}/${total}</span>
             <span style="color: #d4af37; font-size: 20px; font-weight: 300;">›</span>
           </div>
         </div>
@@ -540,16 +608,16 @@
           : `<span>${item.imagen || '🍽️'}</span>`;
 
         return `
-        <div class="product-card" style="animation-delay: ${idx * 0.06}s; cursor: pointer;" onclick="openModal('${(item.imagen || '').replace(/'/g, "\'")}', '${item.nombre.replace(/'/g, "\'")}')">
-          <div style="display: flex; gap: 14px; padding: 14px; border: 1px solid rgba(212,175,55,0.08); border-radius: 12px; background: rgba(255,255,255,0.02);">
-            <div class="product-img">${imgContent}</div>
+        <div class="product-card" style="animation-delay: ${idx * 0.06}s;">
+          <div style="display: flex; gap: 14px; padding: 14px; border: 1px solid rgba(212,175,55,0.1); border-radius: 12px; background: rgba(255,255,255,0.015);">
+            <div class="product-img" onclick="openModal('${item.imagen || ''}', '${item.nombre.replace(/'/g, "\'")}')" style="cursor: pointer;">${imgContent}</div>
             <div style="flex: 1; min-width: 0;">
               <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 10px;">
-                <h4 class="font-display" style="font-size: 17px; color: #d4af37; margin: 0; font-weight: 400; letter-spacing: 0.8px; line-height: 1.25;">${item.nombre}</h4>
-                <span class="font-display" style="font-size: 18px; color: #d4af37; font-weight: 400; white-space: nowrap; letter-spacing: 1px;">${item.precio > 0 ? '$' + item.precio : 'Consultar'}</span>
+                <h4 style="font-size: 16px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.3px; line-height: 1.3;">${item.nombre}</h4>
+                <span style="font-size: 17px; color: #d4af37; font-weight: 600; white-space: nowrap; font-family: 'Inter', sans-serif;">${item.precio > 0 ? '$' + item.precio : 'Consultar'}</span>
               </div>
-              ${item.descripcion ? `<p style="font-size: 14px; color: rgba(245,240,230,0.75); margin: 8px 0 0; line-height: 1.5; font-weight: 300;">${item.descripcion}</p>` : ''}
-              <div style="margin-top: 12px;">
+              ${item.descripcion ? `<p style="font-size: 14px; color: rgba(245,240,230,0.5); margin: 6px 0 0; line-height: 1.45;">${item.descripcion}</p>` : ''}
+              <div style="margin-top: 10px;">
                 <span class="badge ${item.disponible ? 'available' : 'unavailable'}">
                   <span class="badge-dot"></span>
                   ${item.disponible ? 'Disponible' : 'No Disponible'}
@@ -581,11 +649,37 @@
     const modal = document.getElementById('product-modal');
     const body = document.getElementById('modal-body');
     const title = document.getElementById('modal-title');
+    const isUrl = imagen && imagen.startsWith('http');
 
-    // Sanitizar inputs
+    if (isUrl) {
+      body.innerHTML = `<img src="${imagen}" alt="${nombre}">`;
+    } else {
+      body.innerHTML = `
+        <div class="modal-no-photo">
+          <span>${imagen || '🍽️'}</span>
+          <p>No hay foto disponible</p>
+        </div>
+      `;
+    }
+    title.textContent = nombre;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeModal(e) {
+    if (e && e.target !== e.currentTarget) return;
+    const modal = document.getElementById('product-modal');
+    modal.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  // ===== MODAL =====
+  function openModal(imagen, nombre) {
+    const modal = document.getElementById('product-modal');
+    const body = document.getElementById('modal-body');
+    const title = document.getElementById('modal-title');
     imagen = imagen || '';
     nombre = nombre || 'Producto';
-
     const isUrl = imagen.startsWith('http');
 
     if (isUrl) {
@@ -600,9 +694,14 @@
 
   function closeModal(e) {
     if (e && e.target !== e.currentTarget) return;
-    const modal = document.getElementById('product-modal');
-    modal.classList.remove('active');
+    document.getElementById('product-modal').classList.remove('active');
     document.body.style.overflow = '';
+  }
+
+  // ===== CATEGORY ICON FALLBACK =====
+  function onCatImgError(img) {
+    img.style.display = 'none';
+    img.nextElementSibling.style.display = 'inline';
   }
 
   function showScreen(screenId) {
