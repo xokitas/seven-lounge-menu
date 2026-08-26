@@ -562,17 +562,23 @@
       const items = menuData.filter(i => i.categoria === cat);
       const available = items.filter(i => i.disponible).length;
       const total = items.length;
+      const iconData = categoryIcons[cat] || { img: '', emoji: '📋' };
+      const hasImg = iconData.img && iconData.img.startsWith('http');
+      const iconHtml = hasImg
+        ? '<img src="' + iconData.img + '" onerror="onCatImgError(this)" data-emoji="' + iconData.emoji + '" style="width:42px;height:42px;border-radius:10px;object-fit:cover;flex-shrink:0;" alt="' + cat + '"><span style="display:none;font-size:24px;">' + iconData.emoji + '</span>'
+        : '<span style="font-size:24px;">' + iconData.emoji + '</span>';
+
       return `
         <div class="category-card" onclick="showCategory('${cat}')">
           <div style="display: flex; align-items: center; gap: 14px;">
-            <span style="font-size: 24px;">${categoryIcons[cat] || '📋'}</span>
+            ${iconHtml}
             <div>
-              <p style="font-size: 16px; color: #f5f0e6; margin: 0; font-weight: 500; letter-spacing: 0.5px;">${cat}</p>
-              <p style="font-size: 13px; color: rgba(245,240,230,0.45); margin: 3px 0 0;">${categoryDescriptions[cat] || ''}</p>
+              <p class="font-display" style="font-size: 18px; color: #d4af37; margin: 0; font-weight: 400; letter-spacing: 1px;">${cat}</p>
+              <p style="font-size: 13px; color: rgba(245,240,230,0.7); margin: 4px 0 0; font-weight: 300; letter-spacing: 0.3px;">${categoryDescriptions[cat] || ''}</p>
             </div>
           </div>
           <div style="display: flex; align-items: center; gap: 10px;">
-            <span style="font-size: 13px; color: rgba(245,240,230,0.35); font-weight: 500;">${available}/${total}</span>
+            <span style="font-size: 12px; color: rgba(245,240,230,0.3); font-weight: 400; font-family: 'Playfair Display', serif; letter-spacing: 1px;">${available}/${total}</span>
             <span style="color: #d4af37; font-size: 20px; font-weight: 300;">›</span>
           </div>
         </div>
