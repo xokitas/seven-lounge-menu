@@ -435,11 +435,16 @@
     setInterval(checkMenuVersion, POLLING_INTERVAL);
   });
 
-  function showScreen(screenId) {
-    document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
-    const target = document.getElementById(screenId);
-    if (target) target.classList.add('active');
+  function showScreen(screenId, pushToHistory = true) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  const target = document.getElementById(screenId);
+  if (target) target.classList.add('active');
+
+  // Registramos el cambio de pantalla en el historial del navegador
+  if (pushToHistory) {
+    history.pushState({ screen: screenId, category: currentCategory }, '', `#${screenId}`);
   }
+}
 
   function showBanner(show) {
     const banner = document.getElementById('update-banner');
@@ -646,6 +651,25 @@
       document.getElementById('product-modal').classList.remove('active');
     }
   }
+
+  // ═══════════════════════════════════════
+  // NAVEGACIÓN CON GESTOS (HISTORIAL)
+  // ═══════════════════════════════════════
+  window.addEventListener('popstate', (event) => {
+    if (event.state && event.state.screen) {
+      if (event.state.category) {
+        currentCategory = event.state.category;
+        renderProducts(currentCategory);
+      }
+      showScreen(event.state.screen, false);
+    } else {
+      showScreen('screen-hero', false);
+    }
+  });
+
+  // Guardar el estado inicial al cargar la página
+  history.replaceState({ screen: 'screen-hero' }, '', '#screen-hero');
+
 </script>
 </body>
 </html>
