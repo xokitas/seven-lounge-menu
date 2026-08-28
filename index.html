@@ -541,10 +541,16 @@
       const desc = categoryDescriptions[cat] || 'Nuestras opciones';
       const count = menuData.filter(i => i.categoria === cat && i.disponible).length;
 
+      // Evaluamos si hay URL de imagen o mostramos el emoji
+      const isUrl = conf.img && (conf.img.startsWith('http://') || conf.img.startsWith('https://'));
+      const iconHtml = isUrl 
+        ? `<img src="${conf.img}" alt="${cat}" style="width: 38px; height: 38px; object-fit: cover; border-radius: 8px;">`
+        : `<span style="font-size: 26px;">${conf.emoji}</span>`;
+
       return `
         <div class="category-card" onclick="openCategory('${cat}')">
           <div style="display: flex; align-items: center; gap: 14px;">
-            <span style="font-size: 26px;">${conf.emoji}</span>
+            ${iconHtml}
             <div>
               <h4 style="color: #f5f0e6; font-size: 15px; font-weight: 500;">${cat}</h4>
               <p style="color: rgba(245,240,230,0.45); font-size: 12px; margin-top: 2px;">${desc}</p>
