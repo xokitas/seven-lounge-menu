@@ -390,7 +390,7 @@
 </div>
 
 <script>
-  const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyOOui_csFiVXc4zLagElzVom_FOQZXPX90hh-OP2-_XdYBo5DAxS4rblVL2-0q_u4/exec';
+  const GOOGLE_SHEETS_URL = 'https://script.google.com/macros/s/AKfycbyAa-T8MTXzE3pUgI9_RAWlSWqQ55gcdUV9knN_zIs2cg0tcrBGYtA6Kgycr9fgoN6j/exec';
   const CACHE_KEY = 'seven_menu_cache';
   const CACHE_VER_KEY = 'seven_menu_version';
   const POLLING_INTERVAL = 10000; // Consulta cada 10 segundos
@@ -498,7 +498,10 @@
 
   async function checkMenuVersion() {
     try {
-      const response = await fetch(`${GOOGLE_SHEETS_URL}?action=version`);
+      const response = await fetch(`${GOOGLE_SHEETS_URL}?action=version`, {
+        method: 'GET',
+        redirect: 'follow'
+      });
       if (!response.ok) return;
 
       const data = await response.json();
