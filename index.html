@@ -572,14 +572,18 @@
     }
 
     container.innerHTML = products.map(p => {
-      const isUrl = p.imagen.startsWith('http://') || p.imagen.startsWith('https://');
+      // Tomamos la propiedad Imagen (mayúscula) o fallback a imagen
+      const rawImg = p.Imagen || p.imagen || '';
+      const imgUrl = rawImg.trim();
+      const isUrl = imgUrl.startsWith('http://') || imgUrl.startsWith('https://');
+
       const imgHtml = isUrl 
-        ? `<img src="${p.imagen}" alt="${p.nombre}">` 
-        : `<span>${p.imagen}</span>`;
+        ? `<img src="${imgUrl}" alt="${p.nombre}">` 
+        : `<span>${imgUrl || '📷'}</span>`;
 
       return `
         <div class="product-card bg-dark-elevated gold-border" style="border: 1px solid; border-radius: 12px; padding: 14px; display: flex; gap: 14px; align-items: center;">
-          <div class="product-img" onclick="openModal('${p.nombre}', '${p.imagen}')" style="cursor: pointer;">
+          <div class="product-img" onclick="openModal('${p.nombre}', '${imgUrl}')" style="cursor: pointer;">
             ${imgHtml}
           </div>
           <div style="flex: 1;">
