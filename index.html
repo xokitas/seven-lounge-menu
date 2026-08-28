@@ -431,10 +431,12 @@
     </div>
   </div>
 
-  <!-- ===== LOADING ===== -->
+  <!-- ===== SKELETON LOADER ===== -->
   <div id="loading">
-    <div class="loader" style="margin-bottom: 18px;"></div>
-    <p style="font-size: 13px; letter-spacing: 4px; color: #d4af37; text-transform: uppercase; font-weight: 500;">Cargando menú...</p>
+    <div style="text-align: center;">
+      <div class="loader" style="margin: 0 auto 18px;"></div>
+      <p id="loading-text" style="font-size: 13px; letter-spacing: 4px; color: #d4af37; text-transform: uppercase; font-weight: 500;">Cargando menú...</p>
+    </div>
   </div>
 
 
@@ -473,12 +475,12 @@
   const categoryIcons = {
     // Formato: { img: 'https://url.jpg', emoji: '🍸' }
     // Si no tienes foto, deja img vacío: ''
-    'Cócteles': { img: 'https://i.imgur.com/4mLbMN8.png', emoji: '🍸' },
-    'Licores & Tragos': { img: 'https://i.imgur.com/gTtTD1W.png', emoji: '🥃' },
+    'Cócteles': { img: '', emoji: '🍸' },
+    'Licores & Tragos': { img: '', emoji: '🥃' },
     'Cervezas': { img: '', emoji: '🍺' },
-    'Piqueos': { img: 'https://i.imgur.com/rgKyJw9.png', emoji: '🍽️' },
+    'Piqueos': { img: '', emoji: '🍽️' },
     'Sin Alcohol': { img: '', emoji: '🥤' },
-    'Especiales': { img: 'https://i.imgur.com/M3PaIH8.png', emoji: '⭐' }
+    'Especiales': { img: '', emoji: '⭐' }
   };
 
   const categoryDescriptions = {
@@ -508,49 +510,88 @@
   // ═══════════════════════════════════════
   async function loadMenu() {
     const loader = document.getElementById('loading');
+    const loadingText = document.getElementById('loading-text');
     const CACHE_KEY = 'seven_menu_cache';
+    const MAX_RETRIES = 3;
 
-    // 1. Mostrar cache INSTANTÁNEAMENTE si existe
+    // 1. MOSTRAR CACHE INMEDIATAMENTE (sin esperar nada)
     const cached = localStorage.getItem(CACHE_KEY);
     if (cached) {
       try {
         menuData = JSON.parse(cached);
         renderCategories();
         loader.style.opacity = '0';
-        setTimeout(() => { loader.style.display = 'none'; }, 150);
+        setTimeout(() => { loader.style.display = 'none'; }, 200);
       } catch (e) {
         localStorage.removeItem(CACHE_KEY);
       }
     }
 
-    // 2. Si no hay URL configurada, mostrar error
+    // 2. Si no hay URL, mostrar skeleton amigable (no error rojo)
     if (!GOOGLE_SHEETS_URL || DEMO_MODE) {
       if (!cached) {
-        loader.innerHTML = '<p style="color:#f87171;font-size:13px;">Configuración pendiente</p>';
+        loadingText.textContent = 'Menú no disponible';
       }
       return;
     }
 
-    // 3. Actualizar desde Google Sheets en background
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 4000);
-      const response = await fetch(GOOGLE_SHEETS_URL, { signal: controller.signal });
-      clearTimeout(timeoutId);
+    // 3. INTENTAR CARGAR CON REINTENTOS
+    let lastError = null;
+    for (let attempt = 1; attempt <= MAX_RETRIES; attempt++) {
+      if (attempt > 1) {
+        loadingText.textContent = 'Reintentando... (' + attempt + '/' + MAX_RETRIES + ')';
+      }
 
-      const freshData = await response.json();
+      try {
+        // Intentar fetch con timeout generoso (10s para móviles lentos)
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000);
+        const response = await fetch(GOOGLE_SHEETS_URL, { signal: controller.signal });
+        clearTimeout(timeoutId);
 
-      // Solo actualizar si cambió algo
-      if (JSON.stringify(freshData) !== JSON.stringify(menuData)) {
+        if (!response.ok) throw new Error('HTTP ' + response.status);
+
+        const freshData = await response.json();
+
+        // Validar que sea un array
+        if (!Array.isArray(freshData)) throw new Error('Formato inválido');
+
+        // Guardar cache y actualizar UI
         menuData = freshData;
         localStorage.setItem(CACHE_KEY, JSON.stringify(menuData));
         renderCategories();
+        loader.style.opacity = '0';
+        setTimeout(() => { loader.style.display = 'none'; }, 200);
+        return; // ÉXITO - salir
+
+      } catch (e) {
+        lastError = e;
+        console.error('Intento ' + attempt + ' falló:', e);
+
+        // Esperar antes de reintentar (backoff: 1s, 2s)
+        if (attempt < MAX_RETRIES) {
+          await new Promise(r => setTimeout(r, attempt * 1000));
+        }
       }
-    } catch (e) {
-      console.error('Error Sheets:', e);
-      if (!cached) {
-        loader.innerHTML = '<p style="color:#f87171;font-size:13px;">No se pudo cargar el menú</p>';
-      }
+    }
+
+    // 4. SI TODOS LOS INTENTOS FALLARON
+    console.error('Todos los intentos fallaron:', lastError);
+
+    if (cached) {
+      // Ya mostramos cache al inicio, solo ocultar loader
+      loader.style.opacity = '0';
+      setTimeout(() => { loader.style.display = 'none'; }, 200);
+    } else {
+      // Primera visita y sin cache: mostrar mensaje elegante, NO error agresivo
+      loader.innerHTML = `
+        <div style="text-align: center; padding: 20px;">
+          <p style="font-size: 32px; margin-bottom: 12px;">🍸</p>
+          <p style="font-size: 14px; color: #f5f0e6; margin-bottom: 8px;">Menú momentáneamente no disponible</p>
+          <p style="font-size: 12px; color: rgba(245,240,230,0.5); margin-bottom: 20px;">Por favor, verifica tu conexión a internet</p>
+          <button onclick="location.reload()" style="background: transparent; border: 1px solid #d4af37; color: #d4af37; padding: 10px 24px; font-size: 11px; letter-spacing: 2px; text-transform: uppercase; cursor: pointer; border-radius: 4px; font-family: inherit;">Reintentar</button>
+        </div>
+      `;
     }
   }
 
